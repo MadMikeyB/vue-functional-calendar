@@ -388,6 +388,12 @@
                 if (this.fConfigs.isDatePicker || this.fConfigs.isDateRange) {
                     classNames.push('cursor-pointer');
                 }
+                
+                // Disable special marked dates 
+                if (this.fConfigs.disableMarkDates && this.fConfigs.markDateSpecial.includes(item.date)) {
+                    classNames.push('cursor-disallowed');
+                    classNames.push('wh_isMark_special_disabled');
+                }
 
                 // Disable marked dates
                 if (this.fConfigs.disableMarkDates && this.fConfigs.markDate.includes(item.date)) {
@@ -395,11 +401,6 @@
                     classNames.push('wh_isMark_disabled');
                 }
 
-                // Disable special marked dates 
-                if (this.fConfigs.disableMarkDates && this.fConfigs.markDateSpecial.includes(item.date)) {
-                    classNames.push('cursor-disallowed');
-                    classNames.push('wh_isMark_special_disabled');
-                }
 
                 // Disable days of week if set in configuration
                 let dayOfWeekString = this.fConfigs.dayNames[new Date(item.date).getDay()];
