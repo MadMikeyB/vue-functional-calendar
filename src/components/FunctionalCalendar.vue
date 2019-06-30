@@ -143,6 +143,7 @@
                     changeMonthFunction: false,
                     changeYearFunction: false,
                     markDate: [],
+                    markDateSpecial: [],
                     markDateMore: [],
                     agoDayHide: 0,
                     futureDayHide: 2554387200,
@@ -211,6 +212,10 @@
                 type: Array,
                 default: () => []
             },
+            markDateSpecial: {
+                type: Array,
+                default: () => []
+            },
             markDateMore: {
                 type: Array,
                 default: () => []
@@ -241,6 +246,12 @@
                 }
             },
             markDate: {
+                handler() {
+                    this.listRendering(this.myDate);
+                },
+                deep: true
+            },
+            markDateSpecial: {
                 handler() {
                     this.listRendering(this.myDate);
                 },
@@ -384,6 +395,12 @@
                     classNames.push('wh_isMark_disabled');
                 }
 
+                // Disable special marked dates 
+                if (this.fConfigs.disableMarkDates && this.fConfigs.markDateSpecial.includes(item.date)) {
+                    classNames.push('cursor-disallowed');
+                    classNames.push('wh_isMark_special_disabled');
+                }
+
                 // Disable days of week if set in configuration
                 let dayOfWeekString = this.fConfigs.dayNames[new Date(item.date).getDay()];
 
@@ -405,6 +422,11 @@
 
                 // Disable days if they are marked.
                 if (this.fConfigs.disableMarkDates && this.fConfigs.markDate.includes(item.date)) {
+                    return false;
+                }
+
+                // Disable days if they are marked.
+                if (this.fConfigs.disableMarkDates && this.fConfigs.markDateSpecial.includes(item.date)) {
                     return false;
                 }
                 
@@ -499,14 +521,18 @@
             forMatArgs: function () {
                 let markDate = this.fConfigs.markDate;
                 let markDateMore = this.fConfigs.markDateMore;
+                let markDateSpecial = this.fConfigs.markDateSpecial;
                 markDate = markDate.map((k) => {
+                    return timeUtil.dateFormat(k);
+                });
+                markDateSpecial = markDateSpecial.map((k) => {
                     return timeUtil.dateFormat(k);
                 });
                 markDateMore = markDateMore.map((k) => {
                     k.date = timeUtil.dateFormat(k.date);
                     return k;
                 });
-                return [markDate, markDateMore];
+                return [markDate, markDateSpecial, markDateMore];
             },
             markChooseDays() {
 
@@ -528,7 +554,7 @@
                 }
             },
             getList: function (date, chooseDay, calendar_index) {
-                const [markDate, markDateMore] = this.forMatArgs();
+                const [markDate, markDateSpecial, markDateMore] = this.forMatArgs();
                 this.calendars[calendar_index].dateTop = `${this.fConfigs.monthNames[date.getMonth()]} ${date.getFullYear()}`;
                 let arr = timeUtil.getMonthList(date);
 
@@ -632,6 +658,7 @@
                     this.fConfigs.monthNames = this.monthNames.length ? this.monthNames : this.fConfigs.monthNames;
 
                     this.fConfigs.markDate = this.markDate;
+                    this.fConfigs.markDateSpecial = this.markDateSpecial;
                     this.fConfigs.markDateMore = this.markDateMore;
                     this.fConfigs.agoDayHide = this.agoDayHide;
                     this.fConfigs.futureDayHide = this.futureDayHide;
